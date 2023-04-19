@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import "./CanvasFlowmapLayer";
+// import "./CanvasFlowmapLayer";
 
 const Map = () => {
   const mapRef = useRef(null);

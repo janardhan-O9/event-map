@@ -1,25 +1,5 @@
-(function(factory, window) {
-  // module loaders support for LeafletJS plugins, see:
-  // https://github.com/Leaflet/Leaflet/blob/master/PLUGIN-GUIDE.md#module-loaders
-
-  // AMD module that relies on "leaflet"
-  if (typeof define === 'function' && define.amd) {
-    define(['leaflet'], factory);
-
-    // Common JS module that relies on "leaflet"
-  } else if (typeof exports === 'object') {
-    module.exports = factory(require('leaflet'));
-  }
-
-  // attach plugin to the global leaflet "L" variable
-  if (typeof window !== 'undefined' && window.L) {
-    window.L.CanvasFlowmapLayer = factory(L);
-
-    window.L.canvasFlowmapLayer = function(originAndDestinationGeoJsonPoints, opts) {
-      return new window.L.CanvasFlowmapLayer(originAndDestinationGeoJsonPoints, opts);
-    };
-  }
-}(function(L) {
+import L from 'leaflet';
+export const CanvasFlowmapLayer = function() {
   // layer source code
   var canvasRenderer = L.canvas();
 
@@ -143,26 +123,10 @@
       // establish animation properties using Tween.js library
       // currently requires the developer to add it to their own app index.html
       // TODO: find better way to wrap it up in this layer source code
-      if (window.hasOwnProperty('TWEEN')) {
-        // set this._animationPropertiesDynamic.duration value
-        this.setAnimationDuration(this.options.animationDuration);
-        // set this._animationPropertiesDynamic.easingInfo value
-        this.setAnimationEasing(this.options.animationEasingFamily, this.options.animationEasingType);
 
-        // initiate the active animation tween
-        this._animationTween = new TWEEN.Tween(this._animationPropertiesStatic)
-          .to({
-            offset: this._animationPropertiesStatic.resetOffset
-          }, this._animationPropertiesDynamic.duration)
-          .easing(this._animationPropertiesDynamic.easingInfo.tweenEasingFunction)
-          .repeat(this._animationPropertiesStatic.repeat)
-          .yoyo(this._animationPropertiesStatic.yoyo)
-          .start();
-      } else {
         // Tween.js lib isn't available,
         // ensure that animations aren't attempted at the beginning
         this.options.animationStarted = false;
-      }
     },
 
     setOriginAndDestinationGeoJsonPoints: function(geoJsonFeatureCollection) {
@@ -307,61 +271,61 @@
       this._animationPropertiesDynamic.duration = milliseconds;
     },
 
-    setAnimationEasing: function(easingFamily, easingType) {
-      var tweenEasingFunction;
-      if (
-        TWEEN.Easing.hasOwnProperty(easingFamily) &&
-        TWEEN.Easing[easingFamily].hasOwnProperty(easingType)
-      ) {
-        tweenEasingFunction = TWEEN.Easing[easingFamily][easingType];
-      } else {
-        easingFamily = this.options.animationEasingFamily;
-        easingType = this.options.animationEasingType;
-        tweenEasingFunction = TWEEN.Easing[easingFamily][easingType];
-      }
+    // setAnimationEasing: function(easingFamily, easingType) {
+    //   var tweenEasingFunction;
+    //   if (
+    //     TWEEN.Easing.hasOwnProperty(easingFamily) &&
+    //     TWEEN.Easing[easingFamily].hasOwnProperty(easingType)
+    //   ) {
+    //     tweenEasingFunction = TWEEN.Easing[easingFamily][easingType];
+    //   } else {
+    //     easingFamily = this.options.animationEasingFamily;
+    //     easingType = this.options.animationEasingType;
+    //     tweenEasingFunction = TWEEN.Easing[easingFamily][easingType];
+    //   }
 
-      // change the tween easing function on the active animation tween
-      if (this._animationTween) {
-        this._animationTween.easing(tweenEasingFunction);
-      }
+    //   // change the tween easing function on the active animation tween
+    //   if (this._animationTween) {
+    //     this._animationTween.easing(tweenEasingFunction);
+    //   }
 
-      this._animationPropertiesDynamic.easingInfo = {
-        easingFamily: easingFamily,
-        easingType: easingType,
-        tweenEasingFunction: tweenEasingFunction
-      };
-    },
+    //   this._animationPropertiesDynamic.easingInfo = {
+    //     easingFamily: easingFamily,
+    //     easingType: easingType,
+    //     tweenEasingFunction: tweenEasingFunction
+    //   };
+    // },
 
-    getAnimationEasingOptions: function(prettyPrint) {
-      var tweenEasingConsoleOptions = {};
-      var tweenEasingOptions = {};
+    // getAnimationEasingOptions: function(prettyPrint) {
+    //   var tweenEasingConsoleOptions = {};
+    //   var tweenEasingOptions = {};
 
-      Object.keys(TWEEN.Easing).forEach(function(family) {
-        tweenEasingConsoleOptions[family] = {
-          types: Object.keys(TWEEN.Easing[family]).join('", "')
-        };
+    //   Object.keys(TWEEN.Easing).forEach(function(family) {
+    //     tweenEasingConsoleOptions[family] = {
+    //       types: Object.keys(TWEEN.Easing[family]).join('", "')
+    //     };
 
-        tweenEasingOptions[family] = {
-          types: Object.keys(TWEEN.Easing[family])
-        };
-      });
+    //     tweenEasingOptions[family] = {
+    //       types: Object.keys(TWEEN.Easing[family])
+    //     };
+    //   });
 
-      if (!!prettyPrint) {
-        console.table(tweenEasingConsoleOptions);
-      }
+    //   if (!!prettyPrint) {
+    //     console.table(tweenEasingConsoleOptions);
+    //   }
 
-      return tweenEasingOptions;
-    },
+    //   return tweenEasingOptions;
+    // },
 
-    playAnimation: function() {
-      this.options.animationStarted = true;
-      this._redrawCanvas();
-    },
+    // playAnimation: function() {
+    //   this.options.animationStarted = true;
+    //   this._redrawCanvas();
+    // },
 
-    stopAnimation: function() {
-      this.options.animationStarted = false;
-      this._redrawCanvas();
-    },
+    // stopAnimation: function() {
+    //   this.options.animationStarted = false;
+    //   this._redrawCanvas();
+    // },
 
     selectFeaturesForPathDisplay: function(selectionFeatures, selectionMode) {
       this._applyFeaturesSelection(selectionFeatures, selectionMode, '_isSelectedForPathDisplay');
@@ -702,22 +666,23 @@
       ctx.bezierCurveTo(screenOriginPoint.x, screenDestinationPoint.y, screenDestinationPoint.x, screenDestinationPoint.y, screenDestinationPoint.x, screenDestinationPoint.y);
     },
 
-    _animator: function(time) {
-      this._animationCanvasElement.getContext('2d')
-        .clearRect(0, 0, this._animationCanvasElement.width, this._animationCanvasElement.height);
+    // _animator: function(time) {
+    //   this._animationCanvasElement.getContext('2d')
+    //     .clearRect(0, 0, this._animationCanvasElement.width, this._animationCanvasElement.height);
 
-      this._drawSelectedCanvasPaths(true); // draw it again to give the appearance of a moving dot with a new lineDashOffset
+    //   this._drawSelectedCanvasPaths(true); // draw it again to give the appearance of a moving dot with a new lineDashOffset
 
-      TWEEN.update(time);
+    //   TWEEN.update(time);
 
-      this._animationFrameId = L.Util.requestAnimFrame(this._animator, this);
-    },
+    //   this._animationFrameId = L.Util.requestAnimFrame(this._animator, this);
+    // },
 
     _wrapGeoJsonCircleMarkers: function() {
       // ensure that the GeoJson point features,
       // which are drawn on the map as individual CircleMarker layers,
       // will be drawn beyond +/-180 longitude
       this.eachLayer(function(layer) {
+        console.log(layer)
         var wrappedLatLng = this._wrapAroundLatLng(layer.getLatLng());
         layer.setLatLng(wrappedLatLng);
       }, this);
@@ -740,4 +705,4 @@
 
   return CanvasFlowmapLayer;
 
-}, window));
+};
